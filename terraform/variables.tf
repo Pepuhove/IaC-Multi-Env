@@ -25,3 +25,6 @@ variable "subnet_id" {
     type    = string
     sensitive = true
 }
+variable "terraform_workspace" {
+  type = string
+}

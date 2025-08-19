@@ -1,30 +1,30 @@
 # Local .terraform directories
-**/.terraform/*
+# **/.terraform/*
 
 # Terraform state files
-*.tfstate
-*.tfstate.*
+# *.tfstate
+# *.tfstate.*
 
 # Crash logs
-crash.log
-crash.*.log
+# crash.log
+# crash.*.log
 
 # Exclude override files as they are usually local-only
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
+# override.tf
+# override.tf.json
+# *_override.tf
+# *_override.tf.json
 
 # Terraform plan output
-*.plan
+# *.plan
 
 # Sensitive variable files (never commit creds/secrets)
-*.tfvars
-*.tfvars.json
+# *.tfvars
+# *.tfvars.json
 
 # CLI configuration
-.terraformrc
-terraform.rc
+# .terraformrc
+# terraform.rc
 
 # IDE/editor junk
 .vscode/

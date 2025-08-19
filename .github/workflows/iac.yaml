@@ -61,8 +61,8 @@ jobs:
 
       - name: Terraform Apply
         if: github.event_name == 'push' || github.event.inputs.action == 'apply'
-        run: terraform apply -no-color -input=false -var-file=dev.tfvars -parallelism=1 planfile
+        run: terraform apply -auto-approve -input=false -parallelism=1 planfile
 
       - name: Terraform Destroy
         if: github.event.inputs.action == 'destroy'
-        run: terraform destroy -no-color -input=false -var-file=dev.tfvars
+        run: terraform destroy -no-color -input=false

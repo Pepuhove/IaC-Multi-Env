@@ -49,14 +49,15 @@ jobs:
       - name: Terraform Validate
         run: terraform validate -no-color
 
-      - name: Terraform plan
-        id: plan
+      - name: Terraform plan (for apply)
+        if: github.event.inputs.action == 'apply' || github.event_name == 'push'
+        id: plan_apply
         run: terraform plan -var-file=dev.tfvars -no-color -input=false -out planfile
-        
 
-      - name: Terraform plan status
-        if: steps.plan.outcome == 'failure' 
-        run: exit 1
+      - name: Terraform plan (for destroy)
+        if: github.event.inputs.action == 'destroy'
+        id: plan_destroy
+        run: terraform plan -destroy -var-file=dev.tfvars -no-color -input=false -out destroy.planfile
 
       - name: Terraform Apply
         if: github.event.inputs.action == 'apply' || github.event_name == 'push'
@@ -64,6 +65,4 @@ jobs:
 
       - name: Terraform Destroy
         if: github.event.inputs.action == 'destroy'
-        run: terraform plan -destroy -var-file=dev.tfvars -out=destroy.planfile
-
-# 
+        run: terraform apply -auto-approve -input=false destroy.planfile

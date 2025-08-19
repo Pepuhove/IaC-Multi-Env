@@ -20,7 +20,7 @@ on:
           - destroy
 
 env:
-  tf_actions_working_dir: terraform/Env/dev
+  tf_actions_working_dir: terraform/dev
 
 jobs:
   terraform_dev:

@@ -23,26 +23,10 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: terraform
+        working-directory: terraform/env/dev   # 👈 FIXED path
 
     steps:
       - uses: actions/checkout@v4
-      - name: Debug - Show actual repository structure
-        run: |
-          echo "Current working directory:"
-          pwd
-          echo ""
-          echo "Full directory structure:"
-          find . -type d -name "env" -o -name "dev" | sort
-          echo ""
-          echo "Listing root directory:"
-          ls -la
-          echo ""
-          echo "Looking for env directory:"
-          find . -name "env" -type d 2>/dev/null || echo "No env directory found"
-          echo ""
-          echo "Looking for dev directory:"
-          find . -name "dev" -type d 2>/dev/null || echo "No dev directory found"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -55,35 +39,24 @@ jobs:
         with:
           terraform_version: 1.1.7
 
-      - name: Terraform fmt
-        run: terraform fmt -check
-        continue-on-error: true
-
       - name: Terraform Init
         run: terraform init -input=false
-
-      - name: Select Terraform Workspace
-        run: |
-          terraform workspace new dev && terraform workspace select dev
 
       - name: Terraform Validate
         run: terraform validate -no-color
 
-      - name: Terraform plan (for apply)
+      - name: Terraform Plan (for apply)
         if: github.event.inputs.action == 'apply' || github.event_name == 'push'
-        id: plan_apply
         run: terraform plan -var-file=dev.tfvars -no-color -input=false -out planfile
 
       - name: Terraform Apply
         if: github.event.inputs.action == 'apply' || github.event_name == 'push'
         run: terraform apply -auto-approve -input=false planfile
 
-      # FIXED DESTROY SECTION - Use direct destroy instead of planfile approach
       - name: Terraform Destroy Plan (Preview)
         if: github.event.inputs.action == 'destroy'
-        run: terraform plan -destroy -var-file=dev.tfvars -no-color -input=false
+        run: terraform plan -destroy -var-file=dev.tfvars -no-color -input=false -out destroy.tfplan
 
       - name: Terraform Destroy
         if: github.event.inputs.action == 'destroy'
-        run: terraform destroy -auto-approve -var-file=dev.tfvars -input=false
-        # 
+        run: terraform apply -auto-approve destroy.tfplan

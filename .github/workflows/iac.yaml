@@ -52,7 +52,7 @@ jobs:
       - name: Terraform plan (for apply)
         if: github.event.inputs.action == 'apply' || github.event_name == 'push'
         id: plan_apply
-        run: terraform plan -auto-approve -no-color -input=false -out planfile
+        run: terraform plan -no-color -input=false -out planfile
 
       - name: Terraform Apply
         if: github.event.inputs.action == 'apply' || github.event_name == 'push'

@@ -23,7 +23,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: terraform/env/dev/
+        working-directory: terraform
 
     steps:
       - uses: actions/checkout@v4

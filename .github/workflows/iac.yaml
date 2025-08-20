@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'terraform//env/dev/**'
+      - 'terraform/env/dev/**'
   workflow_dispatch:
     inputs:
       action:

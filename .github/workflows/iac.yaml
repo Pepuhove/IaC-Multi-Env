@@ -1,43 +1,68 @@
-name: Terraform
+name: iac-dev
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - terraform/**
   workflow_dispatch:
     inputs:
-      environment:
-        description: "Environment to deploy (dev, stage, prod)"
+      action:
+        description: "Choose Terraform action to run"
         required: true
-        default: dev
+        default: apply
+        type: choice
+        options:
+          - apply
+          - destroy
 
 jobs:
-  terraform:
+  terraform_dev:
     runs-on: ubuntu-latest
-
     defaults:
       run:
-        working-directory: ./env/${{ github.event.inputs.environment }}
+        shell: bash
+        working-directory: terraform
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          terraform_version: 1.9.8
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.1.7
+
+      - name: Terraform fmt
+        run: terraform fmt -check
+        continue-on-error: true
 
       - name: Terraform Init
         run: terraform init -input=false
 
       - name: Terraform Validate
-        run: terraform validate
+        run: terraform validate -no-color
 
-      - name: Terraform Plan
-        run: terraform plan -input=false -var-file=${{ github.event.inputs.environment }}.tfvars -out=tfplan
+      - name: Terraform plan (for apply)
+        if: github.event.inputs.action == 'apply' || github.event_name == 'push'
+        id: plan_apply
+        run: terraform plan -var-file=dev.tfvars -no-color -input=false -out planfile
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        run: terraform apply -input=false -auto-approve tfplan
+        if: github.event.inputs.action == 'apply' || github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false planfile
+
+      # FIXED DESTROY SECTION - Use direct destroy instead of planfile approach
+      - name: Terraform Destroy Plan (Preview)
+        if: github.event.inputs.action == 'destroy'
+        run: terraform plan -destroy -var-file=dev.tfvars -no-color -input=false
 
       - name: Terraform Destroy
-        if: github.event.inputs.environment == 'dev' && github.event_name == 'workflow_dispatch'
-        run: terraform destroy -auto-approve -input=false -var-file=${{ github.event.inputs.environment }}.tfvars
+        if: github.event.inputs.action == 'destroy'
+        run: terraform destroy -auto-approve -var-file=dev.tfvars -input=false

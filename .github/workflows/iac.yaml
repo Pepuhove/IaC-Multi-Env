@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'terraform/env/dev/**'
+      - 'dev/**'
   workflow_dispatch:
     inputs:
       action:
@@ -23,7 +23,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: terraform/env/dev   # 👈 FIXED path
+        working-directory: dev   # 👈 FIXED path
 
     steps:
       - uses: actions/checkout@v4

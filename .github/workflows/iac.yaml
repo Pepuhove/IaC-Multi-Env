@@ -27,6 +27,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Debug - Show actual repository structure
+        run: |
+          echo "Current working directory:"
+          pwd
+          echo ""
+          echo "Full directory structure:"
+          find . -type d -name "env" -o -name "dev" | sort
+          echo ""
+          echo "Listing root directory:"
+          ls -la
+          echo ""
+          echo "Looking for env directory:"
+          find . -name "env" -type d 2>/dev/null || echo "No env directory found"
+          echo ""
+          echo "Looking for dev directory:"
+          find . -name "dev" -type d 2>/dev/null || echo "No dev directory found"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4

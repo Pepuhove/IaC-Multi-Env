@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - ./env/dev/**
+      - env/dev/**
   workflow_dispatch:
     inputs:
       action:

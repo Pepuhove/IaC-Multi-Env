@@ -52,7 +52,7 @@ jobs:
       - name: Terraform plan (for apply)
         if: github.event.inputs.action == 'apply' || github.event_name == 'push'
         id: plan_apply
-        run: terraform plan -var-file=dev.tfvars -no-color -input=false -out planfile
+        run: terraform plan -var-file=dev/dev.tfvars -no-color -input=false -out planfile
 
       - name: Terraform Apply
         if: github.event.inputs.action == 'apply' || github.event_name == 'push'
@@ -65,5 +65,5 @@ jobs:
 
       - name: Terraform Destroy
         if: github.event.inputs.action == 'destroy'
-        run: terraform plan -destroy -var-file=dev.tfvars -out=destroy.tfplan
+        run: terraform plan -destroy -var-file=dev/dev.tfvars -out=destroy.tfplan
 # 
